@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        li {
+            list-style: none;
+        }
+
+        .done {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        a {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            background-color: crimson;
+            text-align: center;
+            text-decoration: none;
+            margin-left: 400px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="backlog">
+        <h1>总共:{{backlogList.length}},完成:{{aDouble}}</h1>
+        <input v-model="something" type="text" placeholder="请输入待办事项">
+        <input @click="add" type="button" value="添加事项">
+        <ul>
+            <li v-bind:class="{ done: v.isYN}" v-for="(v, i) in backlogList" @click="over(i)">
+                {{i+1}} . {{v.name}}
+                <a v-on:click.stop="del(i)" href="javascript:void(0)">8</a>
+            </li>
+
+        </ul>
+    </div>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+        //判断浏览器 localStorage是否有存值
+        let backlogList=window.localStorage.getItem("backlogList");
+        if(backlogList){
+            // 如果有值
+            backlogList=JSON.parse(backlogList);
+        }else{
+            backlogList=[{
+                name: "8点半起床",
+                isYN: false
+            },
+            {
+                name: "9点半运动",
+                isYN: false
+            },
+            {
+                name: "10点半吃早饭",
+                isYN: false
+            },
+            {
+                name: "11点半吃中饭",
+                isYN: false
+            }]
+        }
+
+    let app = new Vue({
+        el: ".backlog",
+        data: {
+            something: "",
+            backlogList
+        },
+        methods: {
+            add() {
+                this.backlogList.push({
+                    name: this.something,
+                    isYN: false
+                })
+                this.savedata();
+            },
+            over(i) {
+                this.backlogList[i].isYN = !this.backlogList[i].isYN;
+                this.savedata();
+            },
+            // 点击移除
+            del(i) {
+                this.backlogList.splice(i, 1);
+                this.savedata();
+            },
+            // 将记录保存到本地
+            savedata() {
+                window.localStorage.setItem("backlogList", JSON.stringify(app.backlogList));
+            }
+        },
+        // 仅读取
+        computed: {
+            // 仅读取
+            aDouble() {
+                let num = 0;
+                for (let i = 0; i < this.backlogList.length; i++) {
+                    if (this.backlogList[i].isYN) {
+                        num++;
+                    }
+                }
+                return num;
+            }
+
+        },
+
+    })
+</script>
